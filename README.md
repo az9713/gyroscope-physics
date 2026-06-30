@@ -2,7 +2,11 @@
 
 An interactive, rigorous HTML textbook on classical gyroscope physics for readers with graduate-level physics and mathematics background.
 
-The main artifact is [`index.html`](./index.html), a self-contained tutorial with:
+Read the live page here:
+
+**[Gyroscope Physics: A Rigorous Visual Tutorial](https://az9713.github.io/gyroscope-physics/)**
+
+The source artifact is [`index.html`](./index.html), a self-contained tutorial with:
 
 - step-by-step derivations and proofs;
 - MathJax-rendered equations;
@@ -28,6 +32,12 @@ The tutorial covers:
 Open `index.html` in a browser.
 
 MathJax is loaded from a CDN, so equation rendering needs internet access the first time the page is opened unless MathJax is already cached.
+
+## Live Page
+
+GitHub Pages renders the root `index.html` file at:
+
+https://az9713.github.io/gyroscope-physics/
 
 ## Validation
 
