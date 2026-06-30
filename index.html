@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -135,30 +135,61 @@ window.MathJax = {
 <p>Instead, the spin axis moves at right angles to what naive statics suggests. It precesses. This document explains that behavior without hand-waving.</p>
 
 <figure>
-<svg viewBox="0 0 720 330" width="100%" role="img" aria-label="realistic shaded gyroscope with vectors for torque, spin, and precession">
-  <rect x="0" y="0" width="720" height="330" fill="#fffaf0"></rect>
-  <ellipse cx="360" cy="282" rx="220" ry="22" fill="#000" opacity=".08"></ellipse>
-  <g filter="url(#soft-shadow)">
-    <line x1="360" y1="270" x2="360" y2="68" stroke="#6d4614" stroke-width="10" stroke-linecap="round"></line>
-    <circle cx="360" cy="270" r="17" fill="url(#brass-sphere)"></circle>
-    <g transform="rotate(-23 360 150)">
-      <rect x="210" y="137" width="300" height="26" rx="13" fill="url(#steel-cylinder)"></rect>
-      <ellipse cx="360" cy="150" rx="73" ry="73" fill="#b8c1c7" stroke="#67737c" stroke-width="5"></ellipse>
-      <ellipse cx="360" cy="150" rx="50" ry="50" fill="#e9edf0" stroke="#8e9aa2" stroke-width="4"></ellipse>
-      <circle cx="360" cy="150" r="16" fill="url(#brass-sphere)"></circle>
-      <path d="M308 107 C338 90 382 90 412 107" fill="none" stroke="#ffffff" stroke-width="7" opacity=".55" stroke-linecap="round"></path>
+<svg viewBox="0 0 760 360" width="100%" role="img" aria-label="two-panel diagram of a tilted gyroscope top and its torque vectors">
+  <rect x="0" y="0" width="760" height="360" fill="#fffaf0"></rect>
+  <text x="54" y="34" font-size="15" fill="#333" font-weight="bold">3D perspective model</text>
+  <text x="456" y="34" font-size="15" fill="#333" font-weight="bold">Vector diagram</text>
+  <line x1="395" y1="28" x2="395" y2="330" stroke="#d9d3c7" stroke-width="1.5"></line>
+
+  <g transform="translate(195 284)">
+    <ellipse cx="0" cy="0" rx="142" ry="34" fill="#eee6d8" stroke="#c9bea9" stroke-width="1.8"></ellipse>
+    <path d="M-105 0 C-68 -16 68 -16 105 0" fill="none" stroke="#d7cbb8" stroke-width="1"></path>
+    <path d="M-80 14 C-45 2 45 2 80 14" fill="none" stroke="#d7cbb8" stroke-width="1"></path>
+    <line x1="0" y1="0" x2="0" y2="-214" stroke="#777" stroke-width="2.2" stroke-dasharray="7 6"></line>
+    <text x="10" y="-210" font-size="13" fill="#666">vertical</text>
+    <path d="M-83 -21 C-26 -57 74 -54 126 -14" fill="none" stroke="#1c5f74" stroke-width="2.2" stroke-dasharray="6 5"></path>
+    <path d="M126 -14 C144 -1 145 13 128 25" fill="none" stroke="#1c5f74" stroke-width="2.2" marker-end="url(#arrow-blue)"></path>
+    <text x="136" y="9" font-size="13" fill="#1c5f74">precession cone</text>
+    <circle cx="0" cy="0" r="14" fill="url(#brass-sphere)" filter="url(#soft-shadow)"></circle>
+    <text x="-25" y="24" font-size="13" fill="#333">O</text>
+    <g transform="rotate(-38)">
+      <line x1="0" y1="0" x2="0" y2="-190" stroke="#6d4614" stroke-width="9" stroke-linecap="round" filter="url(#soft-shadow)"></line>
+      <ellipse cx="0" cy="-122" rx="72" ry="26" fill="#b8c1c7" stroke="#67737c" stroke-width="4" filter="url(#soft-shadow)"></ellipse>
+      <ellipse cx="0" cy="-122" rx="43" ry="15" fill="#eef1f2" stroke="#8d9aa3" stroke-width="3"></ellipse>
+      <path d="M-48 -134 C-19 -148 28 -146 54 -132" fill="none" stroke="#fff" stroke-width="5" opacity=".7" stroke-linecap="round"></path>
+      <circle cx="0" cy="-122" r="10" fill="url(#brass-sphere)"></circle>
+      <circle cx="0" cy="-94" r="6" fill="#7a1f1f"></circle>
+      <line x1="0" y1="0" x2="0" y2="-94" stroke="#7a1f1f" stroke-width="2.5" marker-end="url(#arrow-red)"></line>
+      <text x="9" y="-51" font-size="13" fill="#7a1f1f">r</text>
+      <line x1="0" y1="0" x2="0" y2="-216" stroke="#2f6d45" stroke-width="3" marker-end="url(#arrow-green)"></line>
+      <text x="8" y="-205" font-size="13" fill="#2f6d45">L</text>
     </g>
+    <line x1="58" y1="-73" x2="58" y2="-20" stroke="#2f6d45" stroke-width="3" marker-end="url(#arrow-green)"></line>
+    <text x="68" y="-26" font-size="13" fill="#2f6d45">Mg</text>
+    <text x="61" y="-78" font-size="13" fill="#333">C</text>
   </g>
-  <line x1="360" y1="270" x2="246" y2="92" stroke="#2f6d45" stroke-width="3" marker-end="url(#arrow-green)"></line>
-  <text x="202" y="82" fill="#2f6d45" font-size="16" font-style="italic">spin angular momentum L</text>
-  <path d="M414 220 C504 194 546 141 540 82" fill="none" stroke="#1c5f74" stroke-width="3" marker-end="url(#arrow-blue)"></path>
-  <text x="546" y="94" fill="#1c5f74" font-size="16" font-style="italic">precession</text>
-  <line x1="360" y1="270" x2="455" y2="252" stroke="#7a1f1f" stroke-width="3" marker-end="url(#arrow-red)"></line>
-  <text x="465" y="260" fill="#7a1f1f" font-size="16" font-style="italic">torque tau = r x Mg</text>
-  <line x1="360" y1="270" x2="360" y2="315" stroke="#777" stroke-width="2"></line>
-  <text x="374" y="312" fill="#555" font-size="14">pivot</text>
+
+  <g transform="translate(575 256)">
+    <ellipse cx="0" cy="0" rx="104" ry="25" fill="#f3efe5" stroke="#d1c5b4" stroke-width="1.5"></ellipse>
+    <circle cx="0" cy="0" r="8" fill="url(#brass-sphere)"></circle>
+    <text x="-23" y="22" font-size="13" fill="#333">O</text>
+    <line x1="0" y1="0" x2="-88" y2="-128" stroke="#7a1f1f" stroke-width="3" marker-end="url(#arrow-red)"></line>
+    <text x="-74" y="-70" font-size="14" fill="#7a1f1f">r</text>
+    <circle cx="-88" cy="-128" r="6" fill="#7a1f1f"></circle>
+    <text x="-111" y="-136" font-size="13" fill="#333">C</text>
+    <line x1="-88" y1="-128" x2="-88" y2="-52" stroke="#2f6d45" stroke-width="3" marker-end="url(#arrow-green)"></line>
+    <text x="-78" y="-64" font-size="14" fill="#2f6d45">Mg</text>
+    <line x1="0" y1="0" x2="-124" y2="-178" stroke="#2f6d45" stroke-width="3.2" marker-end="url(#arrow-green)"></line>
+    <text x="-153" y="-180" font-size="14" fill="#2f6d45">L</text>
+    <line x1="-88" y1="-128" x2="-155" y2="-108" stroke="#7a1f1f" stroke-width="3" marker-end="url(#arrow-red)"></line>
+    <text x="-216" y="-105" font-size="14" fill="#7a1f1f">tau = r x Mg</text>
+    <line x1="0" y1="0" x2="0" y2="-190" stroke="#777" stroke-width="2" stroke-dasharray="7 6"></line>
+    <path d="M-76 -55 C-30 -76 42 -73 79 -49" fill="none" stroke="#1c5f74" stroke-width="2.5" marker-end="url(#arrow-blue)"></path>
+    <text x="50" y="-73" font-size="14" fill="#1c5f74">Omega_p</text>
+    <text x="10" y="-181" font-size="13" fill="#666">vertical</text>
+  </g>
 </svg>
-<figcaption>A real device supplies context; the vectors are schematic. The pivot force does no torque about the pivot. Gravity supplies the torque $\boldsymbol{\tau}=\mathbf r\times M\mathbf g$, where $\mathbf r$ points from the pivot to the center of mass, $M$ is the mass, and $\mathbf g$ is gravitational acceleration.</figcaption>
+<figcaption><b>Fig. 1.</b> A tilted symmetric top about a fixed pivot $O$. The center-of-mass vector $\mathbf r$ points from the pivot to the center of mass $C$, and the weight $M\mathbf g$ produces the gravitational torque $\boldsymbol{\tau}=\mathbf r\times M\mathbf g$. For a rapidly spinning top, the angular momentum $\mathbf L$ lies approximately along the body symmetry axis, so the torque changes the direction of $\mathbf L$ and produces precession about the vertical.</figcaption>
 </figure>
 
 <p>The spine of the argument is short but demanding.</p>
@@ -209,7 +240,7 @@ if a material vector has body coordinate column $a$, then its inertial coordinat
   <path d="M210 126 C275 78 322 78 384 125" fill="none" stroke="#2f6d45" stroke-width="2.5" marker-end="url(#arrow-green)"></path>
   <text x="270" y="66" font-size="16" fill="#2f6d45">R maps body coordinates to space coordinates</text>
 </svg>
-<figcaption>The body frame moves with the material. The same material vector has fixed body coordinates but generally changing inertial coordinates.</figcaption>
+<figcaption><b>Fig. 2.</b> The body frame moves with the material. The same material vector has fixed body coordinates but generally changing inertial coordinates.</figcaption>
 </figure>
 
 <div class="lem"><b>Lemma 1.2 (skew form of angular velocity).</b> If $R(t)\in SO(3)$ is differentiable, then $\widehat{\omega}:=\dot R R^T$ is skew-symmetric. Therefore there is a unique vector $\boldsymbol{\omega}\in\mathbb R^3$ such that $\widehat{\omega}\mathbf x=\boldsymbol{\omega}\times \mathbf x$ for every vector $\mathbf x\in\mathbb R^3$.</div>
@@ -227,7 +258,7 @@ if a material vector has body coordinate column $a$, then its inertial coordinat
   <line x1="212" y1="96" x2="212" y2="22" stroke="#1c5f74" stroke-width="2.5" marker-end="url(#arrow-blue)"></line>
   <text x="222" y="31" font-size="13" fill="#1c5f74">omega</text>
 </svg>
-<figcaption><b>Setup.</b> The vector $\boldsymbol{\omega}$ is the unique vector whose cross-product matrix gives the instantaneous change of every inertial vector carried by the body.</figcaption>
+<figcaption><b>Fig. 3.</b> <b>Setup.</b> The vector $\boldsymbol{\omega}$ is the unique vector whose cross-product matrix gives the instantaneous change of every inertial vector carried by the body.</figcaption>
 </figure>
 Since $R^T R=I$, differentiating gives
 $$
@@ -319,7 +350,7 @@ Here $\mathbf x$ is the position of a material point relative to $O$, and $\bold
   <text x="127" y="84" font-size="14" fill="#7a1f1f">omega</text>
   <text x="436" y="88" font-size="13" fill="#7a1f1f">mass element</text>
 </svg>
-<figcaption>A mass element at position $\mathbf x$ has velocity $\mathbf v=\boldsymbol{\omega}\times\mathbf x$. Only the component of $\mathbf x$ perpendicular to $\boldsymbol{\omega}$ contributes to rotational kinetic energy.</figcaption>
+<figcaption><b>Fig. 4.</b> A mass element at position $\mathbf x$ has velocity $\mathbf v=\boldsymbol{\omega}\times\mathbf x$. Only the component of $\mathbf x$ perpendicular to $\boldsymbol{\omega}$ contributes to rotational kinetic energy.</figcaption>
 </figure>
 
 <div class="prop"><b>Proposition 2.2 (rotational kinetic energy).</b> The kinetic energy $T$ of a rigid body rotating about $O$ is
@@ -441,7 +472,7 @@ $$</div>
   <text x="188" y="41" font-size="13" fill="#2f6d45">L in space</text>
   <text x="290" y="191" font-size="13" fill="#7a1f1f">Pi = R^T L in body</text>
 </svg>
-<figcaption><b>Setup.</b> The spatial law is $\dot{\mathbf L}=\boldsymbol{\tau}$. The body vector $\boldsymbol{\Pi}=R^T\mathbf L$ changes both because $\mathbf L$ changes and because the body frame rotates.</figcaption>
+<figcaption><b>Fig. 5.</b> <b>Setup.</b> The spatial law is $\dot{\mathbf L}=\boldsymbol{\tau}$. The body vector $\boldsymbol{\Pi}=R^T\mathbf L$ changes both because $\mathbf L$ changes and because the body frame rotates.</figcaption>
 </figure>
 Start from Newton's angular-momentum law in inertial coordinates:
 $$
@@ -590,7 +621,7 @@ $$
     <text x="-92" y="-72" font-size="14" fill="#7a1f1f">polhode on inertia ellipsoid</text>
   </g>
 </svg>
-<figcaption>Torque-free motion is confined by two constants. In body coordinates, the angular momentum vector traces the intersection of a sphere and an energy ellipsoid. On the inertia ellipsoid, the angular velocity traces the polhode.</figcaption>
+<figcaption><b>Fig. 6.</b> Torque-free motion is confined by two constants. In body coordinates, the angular momentum vector traces the intersection of a sphere and an energy ellipsoid. On the inertia ellipsoid, the angular velocity traces the polhode.</figcaption>
 </figure>
 
 <h3 id="tennis-racket">4.1 Stability of principal-axis rotations</h3>
@@ -609,7 +640,7 @@ $$
   <text x="225" y="25" font-size="13" fill="#7a1f1f">axis 2</text>
   <text x="74" y="161" font-size="13" fill="#1c5f74">axis 3</text>
 </svg>
-<figcaption><b>Setup.</b> The theorem perturbs exact rotation about one principal axis and studies whether the small transverse components grow.</figcaption>
+<figcaption><b>Fig. 7.</b> <b>Setup.</b> The theorem perturbs exact rotation about one principal axis and studies whether the small transverse components grow.</figcaption>
 </figure>
 First study rotation about axis $1$. Let
 $$
@@ -690,7 +721,7 @@ so generic perturbations grow. Axis $2$ is linearly unstable. <span class="qed">
     <text x="-88" y="26" font-size="14" fill="#555">precession angle phi</text>
   </g>
 </svg>
-<figcaption>The Euler angles used here are $\phi$ for precession about the vertical, $\theta$ for tilt from the vertical, and $\psi$ for spin about the body symmetry axis.</figcaption>
+<figcaption><b>Fig. 8.</b> The Euler angles used here are $\phi$ for precession about the vertical, $\theta$ for tilt from the vertical, and $\psi$ for spin about the body symmetry axis.</figcaption>
 </figure>
 
 <div class="prop"><b>Proposition 5.2 (Lagrangian in Euler angles).</b> For the heavy symmetric top,
@@ -818,7 +849,7 @@ Collecting terms gives $E=\frac12I\dot\theta^2+V_{\rm eff}(\theta)$. <span class
   <text x="420" y="153" font-size="14" fill="#1c5f74">energy E</text>
   <text x="276" y="205" font-size="14" fill="#2f6d45">nutation interval</text>
 </svg>
-<figcaption>Nutation is one-dimensional motion in $V_{\rm eff}(\theta)$. The tilt angle oscillates between turning points where $E=V_{\rm eff}(\theta)$.</figcaption>
+<figcaption><b>Fig. 9.</b> Nutation is one-dimensional motion in $V_{\rm eff}(\theta)$. The tilt angle oscillates between turning points where $E=V_{\rm eff}(\theta)$.</figcaption>
 </figure>
 
 <h2 id="fast-gyro">6. Fast gyroscope asymptotics</h2>
@@ -851,7 +882,7 @@ $$</div>
     <text x="80" y="-62" font-size="13" fill="#7a1f1f">tau</text>
   </g>
 </svg>
-<figcaption><b>Setup.</b> For steady precession, $\mathbf L$ moves around a cone. Its rate of change has magnitude $\Omega_p L_s\sin\theta$, while gravity gives torque magnitude $Mg\ell\sin\theta$.</figcaption>
+<figcaption><b>Fig. 10.</b> <b>Setup.</b> For steady precession, $\mathbf L$ moves around a cone. Its rate of change has magnitude $\Omega_p L_s\sin\theta$, while gravity gives torque magnitude $Mg\ell\sin\theta$.</figcaption>
 </figure>
 For a fast symmetric top, the angular momentum is dominated by spin along the symmetry axis:
 $$
@@ -906,7 +937,7 @@ This is the slow-precession formula. <span class="qed">QED</span>
   <text x="474" y="211" font-size="14" fill="#1c5f74">slow precession</text>
   <text x="446" y="134" font-size="14" fill="#2f6d45">large spin angular momentum</text>
 </svg>
-<figcaption>The disk spins rapidly about its own axis while the axis precesses slowly about the vertical. The animation separates the two time scales visually.</figcaption>
+<figcaption><b>Fig. 11.</b> The disk spins rapidly about its own axis while the axis precesses slowly about the vertical. The animation separates the two time scales visually.</figcaption>
 </figure>
 
 <h2 id="geometric">7. Geometric mechanics view</h2>
@@ -971,7 +1002,7 @@ Since $\mathbf x=R\mathbf X$, the vector producing the same cross product in spa
   <line x1="205" y1="109" x2="164" y2="65" stroke="#7a1f1f" stroke-width="3" marker-end="url(#arrow-red)"></line>
   <text x="65" y="60" fill="#7a1f1f" font-size="15">disturbance torque</text>
 </svg>
-<figcaption>A gimbaled gyroscope tries to isolate the rotor spin axis from base motion. The ideal theory treats the gimbals as massless constraints and the bearings as frictionless. Engineering corrections are precisely the places where those assumptions fail.</figcaption>
+<figcaption><b>Fig. 12.</b> A gimbaled gyroscope tries to isolate the rotor spin axis from base motion. The ideal theory treats the gimbals as massless constraints and the bearings as frictionless. Engineering corrections are precisely the places where those assumptions fail.</figcaption>
 </figure>
 
 <table>
