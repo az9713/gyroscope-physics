@@ -6,6 +6,8 @@ Read the live page here:
 
 **[Gyroscope Physics: A Rigorous Visual Tutorial](https://az9713.github.io/gyroscope-physics/)**
 
+[![Screenshot of the Gyroscope Physics tutorial](assets/preview.png)](https://az9713.github.io/gyroscope-physics/)
+
 The source artifact is [`index.html`](./index.html), a self-contained tutorial with:
 
 - step-by-step derivations and proofs;
