@@ -1,0 +1,1112 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gyroscope Physics: A Rigorous Visual Tutorial</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], tags: 'ams' },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-svg.js" async></script>
+<style>
+  :root{
+    --fg:#181818; --muted:#555; --accent:#7a1f1f; --accent2:#1c5f74;
+    --rule:#d9d3c7; --box:#f7f3ea; --paper:#fffdf8; --ink:#252525;
+    --gold:#c08a2d; --steel:#9ca9b1; --green:#2f6d45;
+  }
+  html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+  body{ max-width:58rem; margin:2.2rem auto; padding:0 1.25rem 6rem;
+        font:16px/1.68 Georgia,"Times New Roman",serif; color:var(--fg); background:var(--paper); }
+  h1{ font-size:2.05rem; line-height:1.16; margin:.2rem 0 .35rem; letter-spacing:0; }
+  h2{ font-size:1.38rem; margin:2.7rem 0 .75rem; border-bottom:2px solid var(--accent); padding-bottom:.22rem; }
+  h3{ font-size:1.12rem; margin:1.7rem 0 .45rem; color:var(--accent); }
+  h4{ font-size:1rem; margin:1.2rem 0 .25rem; color:#333; }
+  p{ margin:.68rem 0; }
+  .sub{ color:var(--muted); font-style:italic; margin-top:0; max-width:48rem; }
+  .toc{ background:var(--box); padding:1rem 1.25rem; border-radius:6px; font-size:.95rem; border:1px solid var(--rule); }
+  .toc ul{ list-style:none; padding-left:.3rem; margin:.35rem 0; columns:2; column-gap:2rem; }
+  .toc li{ break-inside:avoid; margin:.12rem 0; }
+  .toc a{ color:var(--accent); text-decoration:none; }
+  .toc a:hover{ text-decoration:underline; }
+  .note,.def,.lem,.prop,.thm{ background:var(--box); border-left:4px solid var(--accent); padding:.72rem .95rem; margin:1rem 0; border-radius:0 5px 5px 0; }
+  .note{ border-left-color:var(--accent2); }
+  .def b,.lem b,.prop b,.thm b,.note b{ color:var(--accent); }
+  .note b{ color:var(--accent2); }
+  .proof{ border-left:2px solid var(--rule); padding-left:.95rem; margin:.85rem 0 1.35rem; color:#222; }
+  .proof::before{ content:"Proof."; font-style:italic; font-weight:bold; margin-right:.4rem; }
+  .qed{ float:right; }
+  .keyresult{ background:#fff7da; border:1px solid #dfc96b; padding:.58rem .9rem; border-radius:5px; margin:1rem 0; }
+  .bridge{ color:#444; font-style:italic; }
+  table{ border-collapse:collapse; width:100%; margin:1rem 0; font-size:.94rem; background:#fff; }
+  th,td{ border:1px solid var(--rule); padding:.48rem .62rem; text-align:left; vertical-align:top; }
+  th{ background:var(--box); color:#332; }
+  figure{ margin:1.45rem 0; text-align:center; }
+  figcaption{ color:var(--muted); font-size:.9rem; font-style:italic; margin-top:.42rem; line-height:1.45; }
+  svg{ max-width:100%; height:auto; }
+  .proof figure,.thm figure,.lem figure,.prop figure{ margin:.25rem auto .75rem; max-width:470px; background:#fff; border:1px solid var(--rule); border-radius:5px; padding:.45rem; }
+  .proof figcaption,.thm figcaption,.lem figcaption,.prop figcaption{ font-size:.8rem; line-height:1.38; }
+  .secref{ color:var(--accent); text-decoration:none; border-bottom:1px dotted #b98; }
+  .secref:hover{ border-bottom:1px solid var(--accent); }
+  code{ font-family:ui-monospace,"SFMono-Regular",Consolas,monospace; font-size:.92em; background:#f1eee6; padding:.05rem .25rem; border-radius:3px; }
+  pre{ background:#f1eee6; padding:.85rem 1rem; border-radius:5px; overflow:auto; font-size:.84rem; line-height:1.45; }
+  pre code{ background:none; padding:0; }
+  .codewrap{ position:relative; }
+  .copybtn{ position:absolute; top:.5rem; right:.5rem; display:inline-flex; align-items:center; gap:.3rem;
+    font:600 .72rem/1 ui-monospace,Consolas,monospace; color:var(--muted);
+    background:#fff; border:1px solid var(--rule); border-radius:5px; padding:.32rem .5rem; cursor:pointer; }
+  .copybtn:hover{ color:var(--accent); border-color:var(--accent); }
+  .copybtn.copied{ color:#2a7d2a; border-color:#2a7d2a; }
+  .copybtn svg{ width:13px; height:13px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:start; margin:1rem 0; }
+  .mini{ font-size:.92rem; color:#333; }
+  .pill{ display:inline-block; font-size:.78rem; color:#fff; background:var(--accent); border-radius:999px; padding:.05rem .5rem; margin-right:.35rem; }
+  .exercise{ border:1px solid var(--rule); background:#fff; border-radius:6px; padding:.72rem .9rem; margin:1rem 0; }
+  details{ background:#fbfaf6; border:1px solid var(--rule); border-radius:5px; padding:.55rem .75rem; margin:.6rem 0; }
+  summary{ cursor:pointer; color:var(--accent); font-weight:bold; }
+  hr{ border:none; border-top:1px solid var(--rule); margin:2.4rem 0; }
+  .math-note{ font-size:.92rem; color:#444; }
+  @media (max-width:700px){
+    body{ margin:1.25rem auto; font-size:15.5px; }
+    .toc ul{ columns:1; }
+    .grid2{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="arrow-red" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,4 L0,8 Z" fill="#7a1f1f"></path>
+    </marker>
+    <marker id="arrow-blue" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,4 L0,8 Z" fill="#1c5f74"></path>
+    </marker>
+    <marker id="arrow-green" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,4 L0,8 Z" fill="#2f6d45"></path>
+    </marker>
+    <linearGradient id="steel-cylinder" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#687780"></stop>
+      <stop offset=".18" stop-color="#d6dde1"></stop>
+      <stop offset=".5" stop-color="#9aa7af"></stop>
+      <stop offset=".78" stop-color="#eef2f4"></stop>
+      <stop offset="1" stop-color="#5f6b73"></stop>
+    </linearGradient>
+    <radialGradient id="brass-sphere" cx=".35" cy=".28" r=".75">
+      <stop offset="0" stop-color="#fff0b6"></stop>
+      <stop offset=".45" stop-color="#c28b2d"></stop>
+      <stop offset="1" stop-color="#6d4614"></stop>
+    </radialGradient>
+    <filter id="soft-shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="1.6" dy="2.2" stdDeviation="2" flood-color="#000" flood-opacity=".25"></feDropShadow>
+    </filter>
+  </defs>
+</svg>
+
+<h1>Gyroscope Physics: A Rigorous Visual Tutorial</h1>
+<p class="sub">A textbook-style sequence of lectures for readers fluent in mechanics and mathematics but new to gyroscopic motion.</p>
+
+<div class="toc">
+<b>Contents</b>
+<ul>
+  <li><b>0.</b> <a href="#motivation">Motivation: why a spinning top resists falling</a></li>
+  <li><b>1.</b> <a href="#rotations">Rotations, frames, and angular velocity</a></li>
+  <li><b>2.</b> <a href="#inertia">Inertia tensor, kinetic energy, and angular momentum</a></li>
+  <li><b>3.</b> <a href="#euler">Euler equations and their variational origin</a></li>
+  <li><b>4.</b> <a href="#torque-free">Torque-free rigid bodies and Poinsot geometry</a></li>
+  <li><b>5.</b> <a href="#heavy-top">The heavy symmetric top</a></li>
+  <li><b>6.</b> <a href="#fast-gyro">Fast gyroscope asymptotics</a></li>
+  <li><b>7.</b> <a href="#geometric">Geometric mechanics view</a></li>
+  <li><b>8.</b> <a href="#practical">Practical gyroscopes and model limits</a></li>
+  <li><b>A.</b> <a href="#notation">Notation and identities</a></li>
+  <li><b>B.</b> <a href="#exercises">Exercises with solutions</a></li>
+</ul>
+</div>
+
+<hr>
+
+<h2 id="motivation">0. Motivation: why a spinning top resists falling</h2>
+
+<p>A child's top, a bicycle wheel held by its axle, and a spacecraft control moment gyroscope all display the same surprise: a sideways torque does not mostly make the spin axis fall in the direction of the torque.</p>
+
+<p>Instead, the spin axis moves at right angles to what naive statics suggests. It precesses. This document explains that behavior without hand-waving.</p>
+
+<figure>
+<svg viewBox="0 0 720 330" width="100%" role="img" aria-label="realistic shaded gyroscope with vectors for torque, spin, and precession">
+  <rect x="0" y="0" width="720" height="330" fill="#fffaf0"></rect>
+  <ellipse cx="360" cy="282" rx="220" ry="22" fill="#000" opacity=".08"></ellipse>
+  <g filter="url(#soft-shadow)">
+    <line x1="360" y1="270" x2="360" y2="68" stroke="#6d4614" stroke-width="10" stroke-linecap="round"></line>
+    <circle cx="360" cy="270" r="17" fill="url(#brass-sphere)"></circle>
+    <g transform="rotate(-23 360 150)">
+      <rect x="210" y="137" width="300" height="26" rx="13" fill="url(#steel-cylinder)"></rect>
+      <ellipse cx="360" cy="150" rx="73" ry="73" fill="#b8c1c7" stroke="#67737c" stroke-width="5"></ellipse>
+      <ellipse cx="360" cy="150" rx="50" ry="50" fill="#e9edf0" stroke="#8e9aa2" stroke-width="4"></ellipse>
+      <circle cx="360" cy="150" r="16" fill="url(#brass-sphere)"></circle>
+      <path d="M308 107 C338 90 382 90 412 107" fill="none" stroke="#ffffff" stroke-width="7" opacity=".55" stroke-linecap="round"></path>
+    </g>
+  </g>
+  <line x1="360" y1="270" x2="246" y2="92" stroke="#2f6d45" stroke-width="3" marker-end="url(#arrow-green)"></line>
+  <text x="202" y="82" fill="#2f6d45" font-size="16" font-style="italic">spin angular momentum L</text>
+  <path d="M414 220 C504 194 546 141 540 82" fill="none" stroke="#1c5f74" stroke-width="3" marker-end="url(#arrow-blue)"></path>
+  <text x="546" y="94" fill="#1c5f74" font-size="16" font-style="italic">precession</text>
+  <line x1="360" y1="270" x2="455" y2="252" stroke="#7a1f1f" stroke-width="3" marker-end="url(#arrow-red)"></line>
+  <text x="465" y="260" fill="#7a1f1f" font-size="16" font-style="italic">torque tau = r x Mg</text>
+  <line x1="360" y1="270" x2="360" y2="315" stroke="#777" stroke-width="2"></line>
+  <text x="374" y="312" fill="#555" font-size="14">pivot</text>
+</svg>
+<figcaption>A real device supplies context; the vectors are schematic. The pivot force does no torque about the pivot. Gravity supplies the torque $\boldsymbol{\tau}=\mathbf r\times M\mathbf g$, where $\mathbf r$ points from the pivot to the center of mass, $M$ is the mass, and $\mathbf g$ is gravitational acceleration.</figcaption>
+</figure>
+
+<p>The spine of the argument is short but demanding.</p>
+
+<table>
+  <tr><th>Question</th><th>Mathematical object</th><th>Where answered</th></tr>
+  <tr><td>What does it mean for a body to rotate?</td><td>A curve $R(t)$ in the rotation group $SO(3)$</td><td><a class="secref" href="#rotations">&sect;1</a></td></tr>
+  <tr><td>How does mass distribution enter?</td><td>The inertia tensor $\mathbb I$</td><td><a class="secref" href="#inertia">&sect;2</a></td></tr>
+  <tr><td>What is the governing equation?</td><td>Euler's equation $\dot{\boldsymbol{\Pi}}+\boldsymbol{\Omega}\times\boldsymbol{\Pi}=\boldsymbol{\Gamma}$</td><td><a class="secref" href="#euler">&sect;3</a></td></tr>
+  <tr><td>Why is torque-free motion still nontrivial?</td><td>Two conserved quadratic surfaces intersect</td><td><a class="secref" href="#torque-free">&sect;4</a></td></tr>
+  <tr><td>Why does a top precess?</td><td>Gravity changes the direction of $\mathbf L$ instead of mainly changing its magnitude</td><td><a class="secref" href="#heavy-top">&sect;5</a></td></tr>
+</table>
+
+<div class="note"><b>Scope.</b> This is classical rigid-body mechanics. Quantum spin gyroscopes, ring-laser gyroscopes, and relativistic corrections are not mainline topics. They are mentioned only where they clarify what the rigid-body model captures and misses.</div>
+
+<h2 id="rotations">1. Rotations, frames, and angular velocity</h2>
+
+<p class="bridge">We begin by making the word "rotate" precise. Later sections use this structure every time a vector is differentiated in a moving body frame.</p>
+
+<div class="def"><b>Definition 1.1 (rotation matrix).</b> A rotation matrix is a real $3\times 3$ matrix $R$ satisfying $R^T R=I$ and $\det R=1$. The set of all such matrices is denoted $SO(3)$, the special orthogonal group in three dimensions.</div>
+
+<p>Let $\{\mathbf E_1,\mathbf E_2,\mathbf E_3\}$ be a fixed inertial orthonormal basis. Let $\{\mathbf e_1(t),\mathbf e_2(t),\mathbf e_3(t)\}$ be a body-fixed orthonormal basis attached to a rigid body.</p>
+
+<p>The rotation matrix $R(t)$ maps body coordinates to inertial coordinates:
+if a material vector has body coordinate column $a$, then its inertial coordinate column is $Ra$.</p>
+
+<figure>
+<svg viewBox="0 0 620 270" width="100%" role="img" aria-label="fixed and body frames with rotation matrix mapping coordinates">
+  <rect x="0" y="0" width="620" height="270" fill="#fff"></rect>
+  <g transform="translate(110 205)">
+    <line x1="0" y1="0" x2="88" y2="0" stroke="#555" stroke-width="2.5" marker-end="url(#arrow-blue)"></line>
+    <line x1="0" y1="0" x2="0" y2="-88" stroke="#555" stroke-width="2.5" marker-end="url(#arrow-blue)"></line>
+    <line x1="0" y1="0" x2="-54" y2="44" stroke="#555" stroke-width="2.5" marker-end="url(#arrow-blue)"></line>
+    <text x="94" y="5" font-size="14" fill="#555">E1</text>
+    <text x="6" y="-90" font-size="14" fill="#555">E3</text>
+    <text x="-75" y="56" font-size="14" fill="#555">E2</text>
+    <text x="-40" y="34" font-size="14" fill="#555">space frame</text>
+  </g>
+  <g transform="translate(430 165) rotate(-28)">
+    <rect x="-70" y="-32" width="140" height="64" rx="28" fill="url(#steel-cylinder)" opacity=".92" filter="url(#soft-shadow)"></rect>
+    <line x1="0" y1="0" x2="95" y2="0" stroke="#7a1f1f" stroke-width="2.5" marker-end="url(#arrow-red)"></line>
+    <line x1="0" y1="0" x2="0" y2="-85" stroke="#7a1f1f" stroke-width="2.5" marker-end="url(#arrow-red)"></line>
+    <line x1="0" y1="0" x2="-52" y2="42" stroke="#7a1f1f" stroke-width="2.5" marker-end="url(#arrow-red)"></line>
+    <text x="99" y="4" font-size="14" fill="#7a1f1f">e1</text>
+    <text x="6" y="-88" font-size="14" fill="#7a1f1f">e3</text>
+    <text x="-78" y="55" font-size="14" fill="#7a1f1f">e2</text>
+  </g>
+  <path d="M210 126 C275 78 322 78 384 125" fill="none" stroke="#2f6d45" stroke-width="2.5" marker-end="url(#arrow-green)"></path>
+  <text x="270" y="66" font-size="16" fill="#2f6d45">R maps body coordinates to space coordinates</text>
+</svg>
+<figcaption>The body frame moves with the material. The same material vector has fixed body coordinates but generally changing inertial coordinates.</figcaption>
+</figure>
+
+<div class="lem"><b>Lemma 1.2 (skew form of angular velocity).</b> If $R(t)\in SO(3)$ is differentiable, then $\widehat{\omega}:=\dot R R^T$ is skew-symmetric. Therefore there is a unique vector $\boldsymbol{\omega}\in\mathbb R^3$ such that $\widehat{\omega}\mathbf x=\boldsymbol{\omega}\times \mathbf x$ for every vector $\mathbf x\in\mathbb R^3$.</div>
+
+<div class="proof">
+<figure>
+<svg viewBox="0 0 430 190" width="100%" role="img" aria-label="small rotation showing angular velocity vector">
+  <circle cx="212" cy="96" r="58" fill="#f8f5ec" stroke="#d9d3c7"></circle>
+  <line x1="212" y1="96" x2="289" y2="96" stroke="#777" stroke-width="2" marker-end="url(#arrow-blue)"></line>
+  <line x1="212" y1="96" x2="276" y2="54" stroke="#7a1f1f" stroke-width="2.5" marker-end="url(#arrow-red)"></line>
+  <path d="M286 94 A77 77 0 0 0 271 59" fill="none" stroke="#2f6d45" stroke-width="2" marker-end="url(#arrow-green)"></path>
+  <text x="292" y="101" font-size="13" fill="#555">x</text>
+  <text x="282" y="49" font-size="13" fill="#7a1f1f">x + dx</text>
+  <text x="252" y="77" font-size="13" fill="#2f6d45">omega x x dt</text>
+  <line x1="212" y1="96" x2="212" y2="22" stroke="#1c5f74" stroke-width="2.5" marker-end="url(#arrow-blue)"></line>
+  <text x="222" y="31" font-size="13" fill="#1c5f74">omega</text>
+</svg>
+<figcaption><b>Setup.</b> The vector $\boldsymbol{\omega}$ is the unique vector whose cross-product matrix gives the instantaneous change of every inertial vector carried by the body.</figcaption>
+</figure>
+Since $R^T R=I$, differentiating gives
+$$
+\dot R^T R+R^T\dot R=0.
+$$
+Transpose the matrix $\dot R R^T$:
+$$
+(\dot R R^T)^T=R\dot R^T.
+$$
+From $\dot R^T R=-R^T\dot R$, multiply on the left by $R$ and on the right by $R^T$:
+$$
+R\dot R^T=-\dot R R^T.
+$$
+Hence
+$$
+(\dot R R^T)^T=-\dot R R^T,
+$$
+so $\widehat{\omega}=\dot R R^T$ is skew-symmetric.
+
+Every $3\times3$ skew-symmetric matrix has the form
+$$
+\widehat{\omega}=
+\begin{pmatrix}
+0&-\omega_3&\omega_2\\
+\omega_3&0&-\omega_1\\
+-\omega_2&\omega_1&0
+\end{pmatrix},
+$$
+and direct multiplication shows $\widehat{\omega}\mathbf x=\boldsymbol{\omega}\times\mathbf x$. The components $\omega_1,\omega_2,\omega_3$ are unique because the entries of the matrix determine them. <span class="qed">QED</span>
+</div>
+
+<div class="prop"><b>Proposition 1.3 (transport theorem).</b> Let $\mathbf a(t)$ be a vector whose body coordinates are $a(t)$ and whose inertial coordinates are $Ra(t)$. Then
+$$
+\left(\frac{d\mathbf a}{dt}\right)_{\rm space}
+=R\left(\frac{da}{dt}\right)_{\rm body}
++\boldsymbol{\omega}\times \mathbf a .
+$$
+If $a(t)$ is constant in the body, then $\dot{\mathbf a}=\boldsymbol{\omega}\times\mathbf a$.</div>
+
+<div class="proof">
+By definition $\mathbf a=Ra$. Differentiate:
+$$
+\dot{\mathbf a}=\dot R a+R\dot a.
+$$
+Insert $I=R^T R$ into the first term:
+$$
+\dot R a=\dot R R^T R a.
+$$
+Since $\widehat{\omega}=\dot R R^T$ and $\mathbf a=Ra$,
+$$
+\dot R a=\widehat{\omega}\mathbf a=\boldsymbol{\omega}\times\mathbf a.
+$$
+Therefore
+$$
+\dot{\mathbf a}=R\dot a+\boldsymbol{\omega}\times\mathbf a.
+$$
+This is the desired formula. <span class="qed">QED</span>
+</div>
+
+<div class="keyresult">
+$$
+\boxed{\dot{\mathbf a}_{\rm space}=\left(\dot{\mathbf a}\right)_{\rm body}+\boldsymbol{\omega}\times\mathbf a}
+$$
+The entire gyroscope story is hidden in the second term: body-frame vectors acquire extra apparent change because the frame itself rotates.
+</div>
+
+<h2 id="inertia">2. Inertia tensor, kinetic energy, and angular momentum</h2>
+
+<p class="bridge">With angular velocity defined in <a class="secref" href="#rotations">&sect;1</a>, we next ask how a particular body's mass distribution responds to that angular velocity.</p>
+
+<div class="def"><b>Definition 2.1 (inertia tensor about a point).</b> For a rigid body with mass density $\rho(\mathbf x)$ measured from a chosen origin $O$, the inertia tensor $\mathbb I$ is the linear map
+$$
+\mathbb I\boldsymbol{\omega}=\int_{\mathcal B}\rho(\mathbf x)\big(|\mathbf x|^2\boldsymbol{\omega}-(\mathbf x\cdot\boldsymbol{\omega})\mathbf x\big)\,d^3x.
+$$
+Here $\mathbf x$ is the position of a material point relative to $O$, and $\boldsymbol{\omega}$ is angular velocity.</div>
+
+<figure>
+<svg viewBox="0 0 650 270" width="100%" role="img" aria-label="mass element in rigid body with perpendicular velocity">
+  <rect x="0" y="0" width="650" height="270" fill="#fff"></rect>
+  <ellipse cx="335" cy="142" rx="170" ry="85" fill="#f3f0e8" stroke="#cfc6b8" stroke-width="2"></ellipse>
+  <circle cx="335" cy="142" r="4" fill="#222"></circle>
+  <text x="344" y="146" font-size="14">O</text>
+  <circle cx="430" cy="101" r="8" fill="#7a1f1f"></circle>
+  <line x1="335" y1="142" x2="430" y2="101" stroke="#1c5f74" stroke-width="2.5" marker-end="url(#arrow-blue)"></line>
+  <text x="376" y="112" font-size="14" fill="#1c5f74">x</text>
+  <line x1="430" y1="101" x2="486" y2="150" stroke="#2f6d45" stroke-width="2.5" marker-end="url(#arrow-green)"></line>
+  <text x="489" y="158" font-size="14" fill="#2f6d45">v = omega x x</text>
+  <line x1="115" y1="216" x2="115" y2="73" stroke="#7a1f1f" stroke-width="2.5" marker-end="url(#arrow-red)"></line>
+  <text x="127" y="84" font-size="14" fill="#7a1f1f">omega</text>
+  <text x="436" y="88" font-size="13" fill="#7a1f1f">mass element</text>
+</svg>
+<figcaption>A mass element at position $\mathbf x$ has velocity $\mathbf v=\boldsymbol{\omega}\times\mathbf x$. Only the component of $\mathbf x$ perpendicular to $\boldsymbol{\omega}$ contributes to rotational kinetic energy.</figcaption>
+</figure>
+
+<div class="prop"><b>Proposition 2.2 (rotational kinetic energy).</b> The kinetic energy $T$ of a rigid body rotating about $O$ is
+$$
+\boxed{T=\frac12\boldsymbol{\omega}\cdot\mathbb I\boldsymbol{\omega}.}
+$$</div>
+
+<div class="proof">
+The velocity of the material point $\mathbf x$ is $\mathbf v=\boldsymbol{\omega}\times\mathbf x$ by Proposition 1.3. Hence
+$$
+T=\frac12\int_{\mathcal B}\rho(\mathbf x)|\boldsymbol{\omega}\times\mathbf x|^2\,d^3x.
+$$
+Use the vector identity
+$$
+|\boldsymbol{\omega}\times\mathbf x|^2
+=|\boldsymbol{\omega}|^2|\mathbf x|^2-(\boldsymbol{\omega}\cdot\mathbf x)^2.
+$$
+Then
+$$
+T=\frac12\int_{\mathcal B}\rho(\mathbf x)
+\left(|\mathbf x|^2|\boldsymbol{\omega}|^2-(\mathbf x\cdot\boldsymbol{\omega})^2\right)d^3x.
+$$
+Rewrite the scalar integrand as a dot product:
+$$
+|\mathbf x|^2|\boldsymbol{\omega}|^2-(\mathbf x\cdot\boldsymbol{\omega})^2
+=\boldsymbol{\omega}\cdot\left(|\mathbf x|^2\boldsymbol{\omega}-(\mathbf x\cdot\boldsymbol{\omega})\mathbf x\right).
+$$
+Pull the constant vector $\boldsymbol{\omega}$ outside the integral:
+$$
+T=\frac12\boldsymbol{\omega}\cdot
+\int_{\mathcal B}\rho(\mathbf x)\left(|\mathbf x|^2\boldsymbol{\omega}-(\mathbf x\cdot\boldsymbol{\omega})\mathbf x\right)d^3x.
+$$
+The integral is exactly $\mathbb I\boldsymbol{\omega}$ by Definition 2.1, proving the claim. <span class="qed">QED</span>
+</div>
+
+<div class="prop"><b>Proposition 2.3 (angular momentum).</b> The angular momentum $\mathbf L$ about $O$ is
+$$
+\boxed{\mathbf L=\mathbb I\boldsymbol{\omega}.}
+$$</div>
+
+<div class="proof">
+The angular momentum of the body is
+$$
+\mathbf L=\int_{\mathcal B}\rho(\mathbf x)\,\mathbf x\times \mathbf v\,d^3x.
+$$
+For pure rotation, $\mathbf v=\boldsymbol{\omega}\times\mathbf x$. Thus
+$$
+\mathbf L=\int_{\mathcal B}\rho(\mathbf x)\,\mathbf x\times(\boldsymbol{\omega}\times\mathbf x)\,d^3x.
+$$
+Use the triple-product identity
+$$
+\mathbf a\times(\mathbf b\times\mathbf c)=\mathbf b(\mathbf a\cdot\mathbf c)-\mathbf c(\mathbf a\cdot\mathbf b).
+$$
+With $\mathbf a=\mathbf x$, $\mathbf b=\boldsymbol{\omega}$, and $\mathbf c=\mathbf x$,
+$$
+\mathbf x\times(\boldsymbol{\omega}\times\mathbf x)
+=|\mathbf x|^2\boldsymbol{\omega}-(\mathbf x\cdot\boldsymbol{\omega})\mathbf x.
+$$
+Substituting this into the integral gives precisely Definition 2.1. Therefore $\mathbf L=\mathbb I\boldsymbol{\omega}$. <span class="qed">QED</span>
+</div>
+
+<div class="note"><b>Important distinction.</b> Unless $\boldsymbol{\omega}$ points along a principal axis, $\mathbf L=\mathbb I\boldsymbol{\omega}$ is not parallel to $\boldsymbol{\omega}$. This nonparallelism is a central source of rigid-body phenomena.</div>
+
+<h3 id="principal-axes">2.1 Principal axes</h3>
+
+<p>The tensor $\mathbb I$ is symmetric because its matrix in any orthonormal basis has entries
+$$
+I_{ij}=\int \rho(\mathbf x)\left(|\mathbf x|^2\delta_{ij}-x_i x_j\right)d^3x,
+$$
+and $I_{ij}=I_{ji}$. It is positive semidefinite, and positive definite if the mass is not confined to a line through $O$.</p>
+
+<div class="prop"><b>Proposition 2.4 (principal-axis form).</b> For a three-dimensional rigid body not confined to a line, there is an orthonormal body basis in which
+$$
+\mathbb I=\operatorname{diag}(I_1,I_2,I_3),\qquad I_i\gt0.
+$$
+The axes of this basis are the principal axes, and $I_1,I_2,I_3$ are the principal moments of inertia.</div>
+
+<div class="proof">
+The inertia tensor is represented by a real symmetric matrix in any orthonormal basis. The spectral theorem for real symmetric matrices states that such a matrix has three real eigenvalues and an orthonormal eigenbasis.
+
+Choose the body basis to be this eigenbasis. Then the matrix is diagonal, with diagonal entries $I_1,I_2,I_3$. Positive definiteness gives $I_i\gt0$. <span class="qed">QED</span>
+</div>
+
+<h2 id="euler">3. Euler equations and their variational origin</h2>
+
+<p class="bridge">The previous section gave $\mathbf L=\mathbb I\boldsymbol{\omega}$. Now we differentiate angular momentum carefully while respecting the rotating body frame.</p>
+
+<div class="def"><b>Definition 3.1 (body variables).</b> The body angular velocity is $\boldsymbol{\Omega}=R^T\boldsymbol{\omega}$. The body angular momentum is $\boldsymbol{\Pi}=R^T\mathbf L$. The body torque is $\boldsymbol{\Gamma}=R^T\boldsymbol{\tau}$, where $\boldsymbol{\tau}$ is the spatial torque about the chosen origin.</div>
+
+<div class="thm"><b>Theorem 3.2 (Euler's equations).</b> In body coordinates, rotational dynamics about a fixed point obeys
+$$
+\boxed{\dot{\boldsymbol{\Pi}}+\boldsymbol{\Omega}\times\boldsymbol{\Pi}=\boldsymbol{\Gamma}.}
+$$
+In principal axes, where $\boldsymbol{\Pi}=(I_1\Omega_1,I_2\Omega_2,I_3\Omega_3)$, this becomes
+$$
+\begin{aligned}
+I_1\dot\Omega_1+(I_3-I_2)\Omega_2\Omega_3&=\Gamma_1,\\
+I_2\dot\Omega_2+(I_1-I_3)\Omega_3\Omega_1&=\Gamma_2,\\
+I_3\dot\Omega_3+(I_2-I_1)\Omega_1\Omega_2&=\Gamma_3.
+\end{aligned}
+$$</div>
+
+<div class="proof">
+<figure>
+<svg viewBox="0 0 440 210" width="100%" role="img" aria-label="space angular momentum and body angular momentum relation">
+  <rect x="0" y="0" width="440" height="210" fill="#fff"></rect>
+  <g transform="translate(116 162)">
+    <line x1="0" y1="0" x2="0" y2="-118" stroke="#555" stroke-width="2" marker-end="url(#arrow-blue)"></line>
+    <line x1="0" y1="0" x2="86" y2="-30" stroke="#555" stroke-width="2" marker-end="url(#arrow-blue)"></line>
+    <text x="8" y="-118" font-size="13" fill="#555">space</text>
+  </g>
+  <g transform="translate(286 146) rotate(-25)">
+    <rect x="-54" y="-22" width="108" height="44" rx="20" fill="url(#steel-cylinder)" opacity=".85"></rect>
+    <line x1="0" y1="0" x2="0" y2="-95" stroke="#7a1f1f" stroke-width="2.5" marker-end="url(#arrow-red)"></line>
+    <line x1="0" y1="0" x2="76" y2="-18" stroke="#7a1f1f" stroke-width="2.5" marker-end="url(#arrow-red)"></line>
+    <text x="8" y="-98" font-size="13" fill="#7a1f1f">body</text>
+  </g>
+  <line x1="286" y1="146" x2="204" y2="48" stroke="#2f6d45" stroke-width="3" marker-end="url(#arrow-green)"></line>
+  <text x="188" y="41" font-size="13" fill="#2f6d45">L in space</text>
+  <text x="290" y="191" font-size="13" fill="#7a1f1f">Pi = R^T L in body</text>
+</svg>
+<figcaption><b>Setup.</b> The spatial law is $\dot{\mathbf L}=\boldsymbol{\tau}$. The body vector $\boldsymbol{\Pi}=R^T\mathbf L$ changes both because $\mathbf L$ changes and because the body frame rotates.</figcaption>
+</figure>
+Start from Newton's angular-momentum law in inertial coordinates:
+$$
+\dot{\mathbf L}=\boldsymbol{\tau}.
+$$
+Write $\mathbf L=R\boldsymbol{\Pi}$. Differentiate:
+$$
+\dot{\mathbf L}=\dot R\boldsymbol{\Pi}+R\dot{\boldsymbol{\Pi}}.
+$$
+Multiply by $R^T$:
+$$
+R^T\dot{\mathbf L}=R^T\dot R\boldsymbol{\Pi}+\dot{\boldsymbol{\Pi}}.
+$$
+The body cross-product matrix is $\widehat{\Omega}=R^T\dot R$. It acts as $\widehat{\Omega}\boldsymbol{\Pi}=\boldsymbol{\Omega}\times\boldsymbol{\Pi}$. Also $R^T\dot{\mathbf L}=R^T\boldsymbol{\tau}=\boldsymbol{\Gamma}$. Therefore
+$$
+\boldsymbol{\Gamma}=\boldsymbol{\Omega}\times\boldsymbol{\Pi}+\dot{\boldsymbol{\Pi}},
+$$
+which gives Euler's vector equation.
+
+In principal axes, $\boldsymbol{\Pi}=(I_1\Omega_1,I_2\Omega_2,I_3\Omega_3)$. The first component of $\boldsymbol{\Omega}\times\boldsymbol{\Pi}$ is
+$$
+(\boldsymbol{\Omega}\times\boldsymbol{\Pi})_1
+=\Omega_2 I_3\Omega_3-\Omega_3 I_2\Omega_2
+=(I_3-I_2)\Omega_2\Omega_3.
+$$
+The other two components follow by cyclic permutation. <span class="qed">QED</span>
+</div>
+
+<h3 id="variational-origin">3.1 Variational origin</h3>
+
+<p>For a torque-free body, Euler's equations also follow from Hamilton's principle on $SO(3)$. This view matters later because gyroscopes are best understood as constrained geometric systems, not merely as component equations.</p>
+
+<div class="prop"><b>Proposition 3.3 (Euler-Poincare equation for the free rigid body).</b> Let the Lagrangian be
+$$
+\ell(\boldsymbol{\Omega})=\frac12\boldsymbol{\Omega}\cdot\mathbb I\boldsymbol{\Omega}.
+$$
+Stationarity of $\int_{t_0}^{t_1}\ell(\boldsymbol{\Omega})\,dt$ under variations vanishing at the endpoints implies
+$$
+\dot{\boldsymbol{\Pi}}+\boldsymbol{\Omega}\times\boldsymbol{\Pi}=0,\qquad
+\boldsymbol{\Pi}=\frac{\partial\ell}{\partial\boldsymbol{\Omega}}=\mathbb I\boldsymbol{\Omega}.
+$$</div>
+
+<div class="proof">
+Let $\eta(t)$ be an arbitrary body vector vanishing at $t_0$ and $t_1$. The constrained variation of body angular velocity has the form
+$$
+\delta\boldsymbol{\Omega}=\dot\eta+\boldsymbol{\Omega}\times\eta.
+$$
+Then
+$$
+\delta\int_{t_0}^{t_1}\ell\,dt
+=\int_{t_0}^{t_1}\boldsymbol{\Pi}\cdot
+(\dot\eta+\boldsymbol{\Omega}\times\eta)\,dt.
+$$
+Integrate the first term by parts:
+$$
+\int \boldsymbol{\Pi}\cdot\dot\eta\,dt
+=\left[\boldsymbol{\Pi}\cdot\eta\right]_{t_0}^{t_1}
+-\int \dot{\boldsymbol{\Pi}}\cdot\eta\,dt.
+$$
+The boundary term vanishes because $\eta(t_0)=\eta(t_1)=0$.
+
+For the second term, use cyclic invariance of the scalar triple product:
+$$
+\boldsymbol{\Pi}\cdot(\boldsymbol{\Omega}\times\eta)
+=\eta\cdot(\boldsymbol{\Pi}\times\boldsymbol{\Omega})
+=-\eta\cdot(\boldsymbol{\Omega}\times\boldsymbol{\Pi}).
+$$
+Thus
+$$
+\delta\int\ell\,dt
+=-\int_{t_0}^{t_1}
+\left(\dot{\boldsymbol{\Pi}}+\boldsymbol{\Omega}\times\boldsymbol{\Pi}\right)\cdot\eta\,dt.
+$$
+Since $\eta(t)$ is arbitrary, the fundamental lemma of the calculus of variations gives
+$$
+\dot{\boldsymbol{\Pi}}+\boldsymbol{\Omega}\times\boldsymbol{\Pi}=0.
+$$
+<span class="qed">QED</span>
+</div>
+
+<h2 id="torque-free">4. Torque-free rigid bodies and Poinsot geometry</h2>
+
+<p class="bridge">Set the torque in Euler's equations to zero. The resulting motion is not trivial because $\boldsymbol{\Omega}$ and $\boldsymbol{\Pi}$ need not be parallel.</p>
+
+<div class="prop"><b>Proposition 4.1 (two invariants).</b> For torque-free motion,
+$$
+\dot{\boldsymbol{\Pi}}+\boldsymbol{\Omega}\times\boldsymbol{\Pi}=0,
+$$
+the body-frame quantities
+$$
+|\boldsymbol{\Pi}|^2\quad\text{and}\quad
+T=\frac12\boldsymbol{\Omega}\cdot\boldsymbol{\Pi}
+$$
+are constant in time.</div>
+
+<div class="proof">
+Differentiate $|\boldsymbol{\Pi}|^2$:
+$$
+\frac{d}{dt}|\boldsymbol{\Pi}|^2=2\boldsymbol{\Pi}\cdot\dot{\boldsymbol{\Pi}}.
+$$
+Using Euler's equation with zero torque,
+$$
+\dot{\boldsymbol{\Pi}}=-\boldsymbol{\Omega}\times\boldsymbol{\Pi}.
+$$
+Therefore
+$$
+\frac{d}{dt}|\boldsymbol{\Pi}|^2
+=-2\boldsymbol{\Pi}\cdot(\boldsymbol{\Omega}\times\boldsymbol{\Pi})=0,
+$$
+because $\boldsymbol{\Omega}\times\boldsymbol{\Pi}$ is perpendicular to $\boldsymbol{\Pi}$.
+
+For energy, use $T=\frac12\boldsymbol{\Omega}\cdot\boldsymbol{\Pi}$ and $\boldsymbol{\Pi}=\mathbb I\boldsymbol{\Omega}$. Since $\mathbb I$ is symmetric and constant in the body,
+$$
+\dot T=\dot{\boldsymbol{\Omega}}\cdot\boldsymbol{\Pi}.
+$$
+Also $\dot{\boldsymbol{\Pi}}=\mathbb I\dot{\boldsymbol{\Omega}}$, so
+$$
+\dot T=\boldsymbol{\Omega}\cdot\dot{\boldsymbol{\Pi}}.
+$$
+Substitute $\dot{\boldsymbol{\Pi}}=-\boldsymbol{\Omega}\times\boldsymbol{\Pi}$:
+$$
+\dot T=-\boldsymbol{\Omega}\cdot(\boldsymbol{\Omega}\times\boldsymbol{\Pi})=0.
+$$
+<span class="qed">QED</span>
+</div>
+
+<figure>
+<svg viewBox="0 0 700 300" width="100%" role="img" aria-label="intersection of angular momentum sphere and energy ellipsoid">
+  <rect x="0" y="0" width="700" height="300" fill="#fff"></rect>
+  <g transform="translate(190 150)">
+    <ellipse cx="0" cy="0" rx="115" ry="78" fill="#f8f5ec" stroke="#c9bea9" stroke-width="2"></ellipse>
+    <ellipse cx="0" cy="0" rx="86" ry="54" fill="none" stroke="#1c5f74" stroke-width="3"></ellipse>
+    <path d="M-80 -15 C-45 -70 42 -70 84 -10 C42 28 -38 31 -80 -15" fill="none" stroke="#7a1f1f" stroke-width="3">
+      <animate attributeName="stroke-dasharray" values="0 430;160 430;0 430" keyTimes="0;0.5;1" dur="6s" repeatCount="indefinite"></animate>
+    </path>
+    <text x="-108" y="-102" font-size="14" fill="#1c5f74">|Pi| sphere</text>
+    <text x="-112" y="105" font-size="14" fill="#7a1f1f">energy ellipsoid cut</text>
+  </g>
+  <g transform="translate(500 150)">
+    <ellipse cx="0" cy="0" rx="124" ry="44" fill="#f2f5f6" stroke="#a5b0b6" stroke-width="2"></ellipse>
+    <ellipse cx="0" cy="0" rx="82" ry="28" fill="none" stroke="#7a1f1f" stroke-width="3"></ellipse>
+    <circle cx="82" cy="0" r="6" fill="#7a1f1f">
+      <animate attributeName="cx" values="82;0;-82;0;82" keyTimes="0;0.25;0.5;0.75;1" dur="6s" repeatCount="indefinite"></animate>
+      <animate attributeName="cy" values="0;28;0;-28;0" keyTimes="0;0.25;0.5;0.75;1" dur="6s" repeatCount="indefinite"></animate>
+    </circle>
+    <text x="-92" y="-72" font-size="14" fill="#7a1f1f">polhode on inertia ellipsoid</text>
+  </g>
+</svg>
+<figcaption>Torque-free motion is confined by two constants. In body coordinates, the angular momentum vector traces the intersection of a sphere and an energy ellipsoid. On the inertia ellipsoid, the angular velocity traces the polhode.</figcaption>
+</figure>
+
+<h3 id="tennis-racket">4.1 Stability of principal-axis rotations</h3>
+
+<div class="thm"><b>Theorem 4.2 (intermediate-axis instability).</b> Assume $I_1\lt I_2\lt I_3$ and consider torque-free rotation about a principal axis. Rotations about axes $1$ and $3$ are linearly stable, while rotation about axis $2$ is linearly unstable.</div>
+
+<div class="proof">
+<figure>
+<svg viewBox="0 0 430 190" width="100%" role="img" aria-label="three principal axes with middle axis highlighted">
+  <rect x="0" y="0" width="430" height="190" fill="#fff"></rect>
+  <ellipse cx="215" cy="105" rx="120" ry="52" fill="#f8f5ec" stroke="#d9d3c7"></ellipse>
+  <line x1="215" y1="105" x2="330" y2="105" stroke="#2f6d45" stroke-width="2.5" marker-end="url(#arrow-green)"></line>
+  <line x1="215" y1="105" x2="215" y2="20" stroke="#7a1f1f" stroke-width="2.5" marker-end="url(#arrow-red)"></line>
+  <line x1="215" y1="105" x2="130" y2="148" stroke="#1c5f74" stroke-width="2.5" marker-end="url(#arrow-blue)"></line>
+  <text x="335" y="109" font-size="13" fill="#2f6d45">axis 1</text>
+  <text x="225" y="25" font-size="13" fill="#7a1f1f">axis 2</text>
+  <text x="74" y="161" font-size="13" fill="#1c5f74">axis 3</text>
+</svg>
+<figcaption><b>Setup.</b> The theorem perturbs exact rotation about one principal axis and studies whether the small transverse components grow.</figcaption>
+</figure>
+First study rotation about axis $1$. Let
+$$
+\Omega_1=\Omega_0,\qquad \Omega_2=\epsilon_2,\qquad \Omega_3=\epsilon_3,
+$$
+where $\epsilon_2,\epsilon_3$ are small. Keep only first-order terms in $\epsilon_2,\epsilon_3$. Euler's equations give
+$$
+I_2\dot\epsilon_2+(I_1-I_3)\epsilon_3\Omega_0=0,
+$$
+and
+$$
+I_3\dot\epsilon_3+(I_2-I_1)\Omega_0\epsilon_2=0.
+$$
+Differentiate the first equation:
+$$
+I_2\ddot\epsilon_2+(I_1-I_3)\Omega_0\dot\epsilon_3=0.
+$$
+Use the second equation to substitute
+$$
+\dot\epsilon_3=-\frac{(I_2-I_1)\Omega_0}{I_3}\epsilon_2.
+$$
+Thus
+$$
+\ddot\epsilon_2+
+\frac{(I_3-I_1)(I_2-I_1)}{I_2I_3}\Omega_0^2\epsilon_2=0.
+$$
+The coefficient is positive, so perturbations oscillate. Axis $1$ is linearly stable.
+
+For rotation about axis $3$, the same calculation gives
+$$
+\ddot\epsilon_1+
+\frac{(I_3-I_1)(I_3-I_2)}{I_1I_2}\Omega_0^2\epsilon_1=0,
+$$
+again oscillatory, so axis $3$ is stable.
+
+For rotation about axis $2$, let $\Omega_2=\Omega_0$ and perturb $\Omega_1,\Omega_3$. Linearization gives
+$$
+I_1\dot\epsilon_1+(I_3-I_2)\Omega_0\epsilon_3=0,
+$$
+$$
+I_3\dot\epsilon_3+(I_2-I_1)\epsilon_1\Omega_0=0.
+$$
+Differentiate the first equation and substitute the second:
+$$
+\ddot\epsilon_1-
+\frac{(I_3-I_2)(I_2-I_1)}{I_1I_3}\Omega_0^2\epsilon_1=0.
+$$
+The coefficient after the minus sign is positive. Solutions include exponentials $e^{\lambda t}$ with
+$$
+\lambda=\Omega_0\sqrt{\frac{(I_3-I_2)(I_2-I_1)}{I_1I_3}},
+$$
+so generic perturbations grow. Axis $2$ is linearly unstable. <span class="qed">QED</span>
+</div>
+
+<h2 id="heavy-top">5. The heavy symmetric top</h2>
+
+<p class="bridge">Torque-free dynamics explains the body's internal rotation. A gyroscope also feels gravity. We now add one torque and keep enough symmetry to solve the problem.</p>
+
+<div class="def"><b>Definition 5.1 (heavy symmetric top).</b> A heavy symmetric top is a rigid body with one fixed point $O$, mass $M$, center of mass at $\ell\mathbf e_3$ in the body, gravitational acceleration $\mathbf g=-g\mathbf E_3$ in space, and principal moments $I_1=I_2=:I$ and $I_3=:J$. The body axis $\mathbf e_3$ is the symmetry axis.</div>
+
+<figure>
+<svg viewBox="0 0 690 330" width="100%" role="img" aria-label="Euler angles of heavy top">
+  <rect x="0" y="0" width="690" height="330" fill="#fff"></rect>
+  <g transform="translate(345 260)">
+    <line x1="0" y1="0" x2="0" y2="-220" stroke="#555" stroke-width="2.4" marker-end="url(#arrow-blue)"></line>
+    <text x="8" y="-218" font-size="14" fill="#555">vertical E3</text>
+    <line x1="0" y1="0" x2="150" y2="-100" stroke="#7a1f1f" stroke-width="3" marker-end="url(#arrow-red)"></line>
+    <text x="155" y="-102" font-size="14" fill="#7a1f1f">body axis e3</text>
+    <circle cx="0" cy="0" r="12" fill="url(#brass-sphere)"></circle>
+    <circle cx="102" cy="-68" r="8" fill="#7a1f1f"></circle>
+    <text x="112" y="-64" font-size="14" fill="#7a1f1f">center of mass</text>
+    <line x1="102" y1="-68" x2="102" y2="-18" stroke="#2f6d45" stroke-width="2.5" marker-end="url(#arrow-green)"></line>
+    <text x="112" y="-22" font-size="14" fill="#2f6d45">Mg</text>
+    <path d="M0 -72 A72 72 0 0 1 58 -43" fill="none" stroke="#1c5f74" stroke-width="2.5" marker-end="url(#arrow-blue)"></path>
+    <text x="36" y="-83" font-size="14" fill="#1c5f74">theta</text>
+    <path d="M-90 -4 A90 28 0 0 1 74 -16" fill="none" stroke="#777" stroke-width="2"></path>
+    <path d="M74 -16 A90 28 0 0 1 91 -2" fill="none" stroke="#777" stroke-width="2" marker-end="url(#arrow-blue)"></path>
+    <text x="-88" y="26" font-size="14" fill="#555">precession angle phi</text>
+  </g>
+</svg>
+<figcaption>The Euler angles used here are $\phi$ for precession about the vertical, $\theta$ for tilt from the vertical, and $\psi$ for spin about the body symmetry axis.</figcaption>
+</figure>
+
+<div class="prop"><b>Proposition 5.2 (Lagrangian in Euler angles).</b> For the heavy symmetric top,
+$$
+\boxed{
+L=\frac12 I(\dot\theta^2+\dot\phi^2\sin^2\theta)
++\frac12 J(\dot\psi+\dot\phi\cos\theta)^2
+-Mg\ell\cos\theta.}
+$$</div>
+
+<div class="proof">
+The angular velocity of a body described by Euler angles $(\phi,\theta,\psi)$ decomposes into three instantaneous rotations:
+$$
+\boldsymbol{\omega}
+=\dot\phi\,\mathbf E_3+\dot\theta\,\mathbf n+\dot\psi\,\mathbf e_3,
+$$
+where $\mathbf n$ is the line of nodes. The component perpendicular to $\mathbf e_3$ has squared magnitude
+$$
+|\boldsymbol{\omega}_\perp|^2=\dot\theta^2+\dot\phi^2\sin^2\theta,
+$$
+because the part of $\dot\phi\,\mathbf E_3$ perpendicular to $\mathbf e_3$ has length $\dot\phi\sin\theta$ and is orthogonal to the $\dot\theta$ contribution.
+
+The component along $\mathbf e_3$ is
+$$
+\omega_3=\dot\psi+\dot\phi\cos\theta,
+$$
+because $\mathbf E_3\cdot\mathbf e_3=\cos\theta$.
+
+Since $I_1=I_2=I$ and $I_3=J$, the kinetic energy is
+$$
+T=\frac12 I|\boldsymbol{\omega}_\perp|^2+\frac12J\omega_3^2
+=\frac12 I(\dot\theta^2+\dot\phi^2\sin^2\theta)
++\frac12 J(\dot\psi+\dot\phi\cos\theta)^2.
+$$
+The center of mass is height $\ell\cos\theta$ above the pivot, so the gravitational potential is $V=Mg\ell\cos\theta$. Hence $L=T-V$, proving the formula. <span class="qed">QED</span>
+</div>
+
+<div class="prop"><b>Proposition 5.3 (two conserved momenta).</b> The coordinates $\phi$ and $\psi$ are cyclic. Therefore
+$$
+p_\psi=J(\dot\psi+\dot\phi\cos\theta)
+$$
+and
+$$
+p_\phi=I\dot\phi\sin^2\theta+p_\psi\cos\theta
+$$
+are constants.</div>
+
+<div class="proof">
+The Lagrangian in Proposition 5.2 depends on $\dot\phi,\dot\theta,\dot\psi,\theta$ but not on $\phi$ or $\psi$. By the Euler-Lagrange equation for a coordinate $q$,
+$$
+\frac{d}{dt}\frac{\partial L}{\partial \dot q}-\frac{\partial L}{\partial q}=0.
+$$
+For $q=\psi$, $\partial L/\partial\psi=0$, so $\partial L/\partial\dot\psi$ is constant:
+$$
+p_\psi=\frac{\partial L}{\partial\dot\psi}=J(\dot\psi+\dot\phi\cos\theta).
+$$
+For $q=\phi$, $\partial L/\partial\phi=0$, so $\partial L/\partial\dot\phi$ is constant:
+$$
+p_\phi=\frac{\partial L}{\partial\dot\phi}
+=I\dot\phi\sin^2\theta+J(\dot\psi+\dot\phi\cos\theta)\cos\theta.
+$$
+Substitute $p_\psi=J(\dot\psi+\dot\phi\cos\theta)$ to obtain the stated formula. <span class="qed">QED</span>
+</div>
+
+<h3 id="effective-potential">5.1 Effective potential for nutation</h3>
+
+<p>The constants $p_\phi$ and $p_\psi$ reduce the top to a one-dimensional problem in $\theta$. This is the cleanest way to see nutation: the tilt oscillates between turning points of an effective potential.</p>
+
+<div class="prop"><b>Proposition 5.4 (effective potential).</b> Holding $p_\phi$ and $p_\psi$ fixed, the energy can be written
+$$
+E=\frac12 I\dot\theta^2+V_{\rm eff}(\theta),
+$$
+where
+$$
+\boxed{
+V_{\rm eff}(\theta)=
+\frac{(p_\phi-p_\psi\cos\theta)^2}{2I\sin^2\theta}
++\frac{p_\psi^2}{2J}
++Mg\ell\cos\theta.}
+$$</div>
+
+<div class="proof">
+From Proposition 5.3,
+$$
+p_\phi-p_\psi\cos\theta=I\dot\phi\sin^2\theta.
+$$
+Therefore
+$$
+\dot\phi=\frac{p_\phi-p_\psi\cos\theta}{I\sin^2\theta}.
+$$
+The energy is
+$$
+E=\frac12 I\dot\theta^2+\frac12 I\dot\phi^2\sin^2\theta
++\frac12 J(\dot\psi+\dot\phi\cos\theta)^2+Mg\ell\cos\theta.
+$$
+Use $p_\psi=J(\dot\psi+\dot\phi\cos\theta)$ to rewrite the spin term:
+$$
+\frac12 J(\dot\psi+\dot\phi\cos\theta)^2=\frac{p_\psi^2}{2J}.
+$$
+Use the expression for $\dot\phi$ to rewrite the precession term:
+$$
+\frac12 I\dot\phi^2\sin^2\theta
+=\frac12 I
+\left(\frac{p_\phi-p_\psi\cos\theta}{I\sin^2\theta}\right)^2
+\sin^2\theta
+=\frac{(p_\phi-p_\psi\cos\theta)^2}{2I\sin^2\theta}.
+$$
+Collecting terms gives $E=\frac12I\dot\theta^2+V_{\rm eff}(\theta)$. <span class="qed">QED</span>
+</div>
+
+<figure>
+<svg viewBox="0 0 700 300" width="100%" role="img" aria-label="effective potential curve for top nutation">
+  <rect x="0" y="0" width="700" height="300" fill="#fff"></rect>
+  <line x1="70" y1="240" x2="640" y2="240" stroke="#444" stroke-width="2" marker-end="url(#arrow-blue)"></line>
+  <line x1="70" y1="240" x2="70" y2="40" stroke="#444" stroke-width="2" marker-end="url(#arrow-blue)"></line>
+  <text x="635" y="264" font-size="14">theta</text>
+  <text x="30" y="48" font-size="14">Veff</text>
+  <path d="M92 52 C126 238 184 249 240 174 C287 112 344 113 390 151 C455 207 531 221 614 74" fill="none" stroke="#7a1f1f" stroke-width="3"></path>
+  <line x1="110" y1="160" x2="615" y2="160" stroke="#1c5f74" stroke-width="2" stroke-dasharray="6 5"></line>
+  <circle cx="253" cy="160" r="5" fill="#1c5f74"></circle>
+  <circle cx="402" cy="160" r="5" fill="#1c5f74"></circle>
+  <path d="M253 160 C284 190 360 190 402 160" fill="none" stroke="#2f6d45" stroke-width="2.5" marker-end="url(#arrow-green)">
+    <animate attributeName="stroke-dashoffset" values="0;60;0" dur="5s" repeatCount="indefinite"></animate>
+  </path>
+  <text x="420" y="153" font-size="14" fill="#1c5f74">energy E</text>
+  <text x="276" y="205" font-size="14" fill="#2f6d45">nutation interval</text>
+</svg>
+<figcaption>Nutation is one-dimensional motion in $V_{\rm eff}(\theta)$. The tilt angle oscillates between turning points where $E=V_{\rm eff}(\theta)$.</figcaption>
+</figure>
+
+<h2 id="fast-gyro">6. Fast gyroscope asymptotics</h2>
+
+<p class="bridge">The exact heavy-top equations are rich. The familiar slow-precession formula appears when spin angular momentum is large and the tilt changes slowly.</p>
+
+<div class="thm"><b>Theorem 6.1 (slow regular precession of a fast top).</b> Consider a symmetric top with fixed tilt angle $\theta$ and large spin angular momentum
+$$
+L_s=J\omega_s,\qquad \omega_s=\dot\psi+\dot\phi\cos\theta.
+$$
+If $\dot\phi^2$ terms are negligible compared with $\omega_s\dot\phi$, then the precession rate is
+$$
+\boxed{\Omega_p=\dot\phi\approx \frac{Mg\ell}{J\omega_s}.}
+$$</div>
+
+<div class="proof">
+<figure>
+<svg viewBox="0 0 450 220" width="100%" role="img" aria-label="precessing angular momentum cone">
+  <rect x="0" y="0" width="450" height="220" fill="#fff"></rect>
+  <g transform="translate(225 178)">
+    <line x1="0" y1="0" x2="0" y2="-145" stroke="#555" stroke-width="2" marker-end="url(#arrow-blue)"></line>
+    <line x1="0" y1="0" x2="92" y2="-98" stroke="#2f6d45" stroke-width="3" marker-end="url(#arrow-green)"></line>
+    <line x1="0" y1="0" x2="78" y2="-76" stroke="#7a1f1f" stroke-width="2.5" marker-end="url(#arrow-red)"></line>
+    <path d="M-67 -28 A90 30 0 1 1 69 -30" fill="none" stroke="#1c5f74" stroke-width="2.5"></path>
+    <circle cx="92" cy="-98" r="5" fill="#2f6d45">
+      <animateTransform attributeName="transform" type="rotate" values="0 0 0;360 0 0" dur="5s" repeatCount="indefinite"></animateTransform>
+    </circle>
+    <text x="98" y="-102" font-size="13" fill="#2f6d45">L</text>
+    <text x="-78" y="-151" font-size="13" fill="#555">vertical</text>
+    <text x="80" y="-62" font-size="13" fill="#7a1f1f">tau</text>
+  </g>
+</svg>
+<figcaption><b>Setup.</b> For steady precession, $\mathbf L$ moves around a cone. Its rate of change has magnitude $\Omega_p L_s\sin\theta$, while gravity gives torque magnitude $Mg\ell\sin\theta$.</figcaption>
+</figure>
+For a fast symmetric top, the angular momentum is dominated by spin along the symmetry axis:
+$$
+\mathbf L\approx L_s\mathbf e_3,\qquad L_s=J\omega_s.
+$$
+During regular precession at rate $\Omega_p$, the vector $\mathbf e_3$ rotates about the vertical. Its derivative has magnitude
+$$
+|\dot{\mathbf e}_3|=\Omega_p\sin\theta.
+$$
+Therefore
+$$
+|\dot{\mathbf L}|\approx L_s\Omega_p\sin\theta.
+$$
+The gravitational torque about the pivot has magnitude
+$$
+|\boldsymbol{\tau}|=|\mathbf r\times M\mathbf g|
+=Mg\ell\sin\theta.
+$$
+Newton's law $\dot{\mathbf L}=\boldsymbol{\tau}$ gives equal magnitudes:
+$$
+L_s\Omega_p\sin\theta\approx Mg\ell\sin\theta.
+$$
+For $\sin\theta\ne0$, divide by $\sin\theta$:
+$$
+\Omega_p\approx\frac{Mg\ell}{L_s}=\frac{Mg\ell}{J\omega_s}.
+$$
+This is the slow-precession formula. <span class="qed">QED</span>
+</div>
+
+<div class="note"><b>Limiting check.</b> If $M=0$, $g=0$, or $\ell=0$, the torque vanishes and the formula gives $\Omega_p=0$. If the spin $J\omega_s$ increases, the precession slows. Both limits agree with physical intuition and with $\dot{\mathbf L}=\boldsymbol{\tau}$.</div>
+
+<figure>
+<svg viewBox="0 0 700 320" width="100%" role="img" aria-label="SMIL animation of precession and spin">
+  <rect x="0" y="0" width="700" height="320" fill="#fff"></rect>
+  <ellipse cx="350" cy="264" rx="150" ry="32" fill="none" stroke="#c9bea9" stroke-width="2"></ellipse>
+  <line x1="350" y1="264" x2="350" y2="54" stroke="#555" stroke-width="2"></line>
+  <text x="361" y="62" font-size="14" fill="#555">vertical</text>
+  <g transform="translate(350 264)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate" values="0;360" dur="8s" repeatCount="indefinite"></animateTransform>
+      <line x1="0" y1="0" x2="105" y2="-126" stroke="#2f6d45" stroke-width="3" marker-end="url(#arrow-green)"></line>
+      <g transform="translate(76 -91) rotate(-50)">
+        <ellipse cx="0" cy="0" rx="42" ry="18" fill="url(#steel-cylinder)" stroke="#6f7b83"></ellipse>
+        <circle cx="0" cy="0" r="8" fill="url(#brass-sphere)"></circle>
+        <path d="M-29 -9 A32 14 0 0 1 25 -9" fill="none" stroke="#fff" stroke-width="4" opacity=".7">
+          <animateTransform attributeName="transform" type="rotate" values="0;360" dur=".7s" repeatCount="indefinite"></animateTransform>
+        </path>
+      </g>
+    </g>
+  </g>
+  <path d="M224 203 A150 32 0 1 1 473 204" fill="none" stroke="#1c5f74" stroke-width="2.5" marker-end="url(#arrow-blue)"></path>
+  <text x="474" y="211" font-size="14" fill="#1c5f74">slow precession</text>
+  <text x="446" y="134" font-size="14" fill="#2f6d45">large spin angular momentum</text>
+</svg>
+<figcaption>The disk spins rapidly about its own axis while the axis precesses slowly about the vertical. The animation separates the two time scales visually.</figcaption>
+</figure>
+
+<h2 id="geometric">7. Geometric mechanics view</h2>
+
+<p class="bridge">Euler equations are coordinate expressions of a geometric fact: rigid-body motion lives on $SO(3)$, and angular momentum is a momentum map.</p>
+
+<div class="def"><b>Definition 7.1 (Lie algebra of $SO(3)$).</b> The Lie algebra $\mathfrak{so}(3)$ is the vector space of $3\times3$ skew-symmetric matrices. The hat map $\boldsymbol{\Omega}\mapsto\widehat{\Omega}$ identifies $\mathbb R^3$ with $\mathfrak{so}(3)$ by $\widehat{\Omega}\mathbf x=\boldsymbol{\Omega}\times\mathbf x$.</div>
+
+<div class="prop"><b>Proposition 7.2 (body velocity is left-trivialized velocity).</b> If $R(t)\in SO(3)$, then
+$$
+\widehat{\Omega}=R^T\dot R
+$$
+is the body angular velocity matrix, while
+$$
+\widehat{\omega}=\dot R R^T
+$$
+is the spatial angular velocity matrix. They are related by $\boldsymbol{\omega}=R\boldsymbol{\Omega}$.</div>
+
+<div class="proof">
+Both $R^T\dot R$ and $\dot R R^T$ are skew-symmetric by differentiating $R^TR=I$ and $RR^T=I$. To relate them,
+$$
+\dot R R^T=R(R^T\dot R)R^T.
+$$
+Act on a spatial vector $\mathbf x=R\mathbf X$, where $\mathbf X$ is the same vector in body coordinates:
+$$
+\widehat{\omega}\mathbf x
+=R\widehat{\Omega}R^T R\mathbf X
+=R(\boldsymbol{\Omega}\times\mathbf X).
+$$
+Rotations preserve cross products, so
+$$
+R(\boldsymbol{\Omega}\times\mathbf X)=(R\boldsymbol{\Omega})\times(R\mathbf X).
+$$
+Since $\mathbf x=R\mathbf X$, the vector producing the same cross product in space is $\boldsymbol{\omega}=R\boldsymbol{\Omega}$. <span class="qed">QED</span>
+</div>
+
+<div class="note"><b>Why this matters.</b> The extra term $\boldsymbol{\Omega}\times\boldsymbol{\Pi}$ in Euler's equation is not an arbitrary correction. It is the coadjoint transport term caused by representing a conserved spatial vector in a moving body frame.</div>
+
+<h2 id="practical">8. Practical gyroscopes and model limits</h2>
+
+<p class="bridge">The mathematical model has now explained precession, nutation, and torque-free instability. Real gyroscopes add bearings, damping, finite stiffness, sensors, and control loops.</p>
+
+<figure>
+<svg viewBox="0 0 720 330" width="100%" role="img" aria-label="realistic shaded gimbaled gyroscope">
+  <rect x="0" y="0" width="720" height="330" fill="#fff"></rect>
+  <ellipse cx="360" cy="286" rx="235" ry="24" fill="#000" opacity=".07"></ellipse>
+  <g filter="url(#soft-shadow)">
+    <ellipse cx="360" cy="165" rx="190" ry="112" fill="none" stroke="url(#steel-cylinder)" stroke-width="16"></ellipse>
+    <ellipse cx="360" cy="165" rx="136" ry="82" fill="none" stroke="#b5c0c7" stroke-width="10"></ellipse>
+    <rect x="182" y="155" width="356" height="20" rx="10" fill="url(#steel-cylinder)"></rect>
+    <ellipse cx="360" cy="165" rx="72" ry="72" fill="#aeb8bf" stroke="#64717a" stroke-width="5"></ellipse>
+    <ellipse cx="360" cy="165" rx="46" ry="46" fill="#eef1f2" stroke="#8d9aa3" stroke-width="4"></ellipse>
+    <circle cx="180" cy="165" r="18" fill="url(#brass-sphere)"></circle>
+    <circle cx="540" cy="165" r="18" fill="url(#brass-sphere)"></circle>
+    <circle cx="360" cy="55" r="15" fill="url(#brass-sphere)"></circle>
+    <circle cx="360" cy="275" r="15" fill="url(#brass-sphere)"></circle>
+  </g>
+  <line x1="360" y1="165" x2="360" y2="68" stroke="#2f6d45" stroke-width="3" marker-end="url(#arrow-green)"></line>
+  <text x="374" y="77" fill="#2f6d45" font-size="15">spin axis</text>
+  <path d="M518 92 C590 138 590 204 518 244" fill="none" stroke="#1c5f74" stroke-width="3" marker-end="url(#arrow-blue)"></path>
+  <text x="586" y="172" fill="#1c5f74" font-size="15">gimbal freedom</text>
+  <line x1="205" y1="109" x2="164" y2="65" stroke="#7a1f1f" stroke-width="3" marker-end="url(#arrow-red)"></line>
+  <text x="65" y="60" fill="#7a1f1f" font-size="15">disturbance torque</text>
+</svg>
+<figcaption>A gimbaled gyroscope tries to isolate the rotor spin axis from base motion. The ideal theory treats the gimbals as massless constraints and the bearings as frictionless. Engineering corrections are precisely the places where those assumptions fail.</figcaption>
+</figure>
+
+<table>
+  <tr><th>Idealization</th><th>What it captures</th><th>What it misses</th></tr>
+  <tr><td>Rigid body</td><td>Inertia tensor and angular momentum geometry</td><td>Rotor flex, shaft bending, bearing compliance, structural modes</td></tr>
+  <tr><td>Fixed pivot</td><td>Clean torque $\mathbf r\times M\mathbf g$</td><td>Translational vibration and moving support reactions</td></tr>
+  <tr><td>No dissipation</td><td>Exact invariants and reversible nutation</td><td>Bearing friction, air drag, damping of nutation</td></tr>
+  <tr><td>Large spin</td><td>Slow-precession approximation</td><td>Fast transients, finite-spin corrections, startup behavior</td></tr>
+  <tr><td>Perfect symmetry</td><td>Two cyclic coordinates for the heavy top</td><td>Rotor imbalance, manufacturing tolerances, cross-axis coupling</td></tr>
+</table>
+
+<div class="prop"><b>Proposition 8.1 (dissipation changes energy but not the kinematic structure).</b> If a damping torque $-\mathsf D\boldsymbol{\Omega}$ is added in body coordinates, where $\mathsf D$ is symmetric positive semidefinite, then the rotational energy satisfies
+$$
+\dot T=-\boldsymbol{\Omega}\cdot \mathsf D\boldsymbol{\Omega}\le0
+$$
+for torque-free damped motion.</div>
+
+<div class="proof">
+The damped Euler equation is
+$$
+\dot{\boldsymbol{\Pi}}+\boldsymbol{\Omega}\times\boldsymbol{\Pi}
+=-\mathsf D\boldsymbol{\Omega}.
+$$
+As in Proposition 4.1,
+$$
+\dot T=\boldsymbol{\Omega}\cdot\dot{\boldsymbol{\Pi}}.
+$$
+Substitute the damped equation:
+$$
+\dot T=
+\boldsymbol{\Omega}\cdot
+\left(-\boldsymbol{\Omega}\times\boldsymbol{\Pi}-\mathsf D\boldsymbol{\Omega}\right).
+$$
+The cross-product term vanishes because $\boldsymbol{\Omega}\cdot(\boldsymbol{\Omega}\times\boldsymbol{\Pi})=0$. Thus
+$$
+\dot T=-\boldsymbol{\Omega}\cdot\mathsf D\boldsymbol{\Omega}.
+$$
+If $\mathsf D$ is positive semidefinite, the quadratic form is nonnegative, so $\dot T\le0$. <span class="qed">QED</span>
+</div>
+
+<h2 id="notation">A. Notation and identities</h2>
+
+<table>
+  <tr><th>Symbol</th><th>Meaning</th></tr>
+  <tr><td>$R$</td><td>Rotation matrix mapping body coordinates to inertial coordinates</td></tr>
+  <tr><td>$\boldsymbol{\omega}$</td><td>Spatial angular velocity vector</td></tr>
+  <tr><td>$\boldsymbol{\Omega}$</td><td>Body angular velocity vector, $R^T\boldsymbol{\omega}$</td></tr>
+  <tr><td>$\mathbb I$</td><td>Inertia tensor about the chosen origin</td></tr>
+  <tr><td>$\mathbf L$</td><td>Spatial angular momentum</td></tr>
+  <tr><td>$\boldsymbol{\Pi}$</td><td>Body angular momentum, $R^T\mathbf L$</td></tr>
+  <tr><td>$\boldsymbol{\tau}$</td><td>Spatial torque</td></tr>
+  <tr><td>$\boldsymbol{\Gamma}$</td><td>Body torque, $R^T\boldsymbol{\tau}$</td></tr>
+  <tr><td>$I,J$</td><td>Transverse and axial principal moments of a symmetric top</td></tr>
+  <tr><td>$M,g,\ell$</td><td>Mass, gravitational acceleration magnitude, and pivot-to-center-of-mass distance</td></tr>
+</table>
+
+<div class="note"><b>Vector identities used repeatedly.</b>
+$$
+\mathbf a\times(\mathbf b\times\mathbf c)=\mathbf b(\mathbf a\cdot\mathbf c)-\mathbf c(\mathbf a\cdot\mathbf b),
+$$
+$$
+\mathbf a\cdot(\mathbf b\times\mathbf c)=\mathbf b\cdot(\mathbf c\times\mathbf a)=\mathbf c\cdot(\mathbf a\times\mathbf b),
+$$
+and, for any rotation $R$,
+$$
+R(\mathbf a\times\mathbf b)=(R\mathbf a)\times(R\mathbf b).
+$$
+</div>
+
+<h2 id="exercises">B. Exercises with solutions</h2>
+
+<div class="exercise">
+<p><span class="pill">Conceptual</span><b>Exercise B.1.</b> Suppose $\mathbb I\boldsymbol{\Omega}$ is not parallel to $\boldsymbol{\Omega}$. Explain why the kinetic energy is still $\frac12\boldsymbol{\Omega}\cdot\mathbb I\boldsymbol{\Omega}$.</p>
+<details><summary>Solution</summary>
+<p>The formula comes from summing $\frac12|\boldsymbol{\Omega}\times\mathbf x|^2$ over mass elements. It does not require $\mathbb I\boldsymbol{\Omega}$ to be parallel to $\boldsymbol{\Omega}$. Nonparallelism means angular momentum is not in the same direction as angular velocity, but the scalar energy is still the quadratic form associated with the symmetric tensor $\mathbb I$.</p>
+</details>
+</div>
+
+<div class="exercise">
+<p><span class="pill">Derivational</span><b>Exercise B.2.</b> Derive Euler's equations for a symmetric free top with $I_1=I_2=I$ and $I_3=J$.</p>
+<details><summary>Solution</summary>
+<p>Set $\Gamma_i=0$ in Theorem 3.2 and put $I_1=I_2=I$, $I_3=J$. Then
+$$
+I\dot\Omega_1+(J-I)\Omega_2\Omega_3=0,
+$$
+$$
+I\dot\Omega_2+(I-J)\Omega_3\Omega_1=0,
+$$
+and
+$$
+J\dot\Omega_3+(I-I)\Omega_1\Omega_2=0.
+$$
+Thus $\Omega_3$ is constant and $\Omega_1,\Omega_2$ rotate sinusoidally with frequency $|(J-I)\Omega_3|/I$.</p>
+</details>
+</div>
+
+<div class="exercise">
+<p><span class="pill">Computational</span><b>Exercise B.3.</b> For $I_1=1$, $I_2=2$, $I_3=3$, and $\Omega_0=10$, compute the linear growth rate for intermediate-axis instability.</p>
+<details><summary>Solution</summary>
+<p>Use Theorem 4.2:
+$$
+\lambda=\Omega_0\sqrt{\frac{(I_3-I_2)(I_2-I_1)}{I_1I_3}}
+=10\sqrt{\frac{(3-2)(2-1)}{1\cdot3}}
+=\frac{10}{\sqrt3}\approx 5.7735.
+$$</p>
+</details>
+</div>
+
+<div class="codewrap"><button class="copybtn" type="button" onclick="copyCode(this)" aria-label="Copy code to clipboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>Copy</span></button><pre><code># Reproduce the growth rate in Exercise B.3.
+import math
+I1, I2, I3, Omega0 = 1.0, 2.0, 3.0, 10.0
+lam = Omega0 * math.sqrt(((I3 - I2) * (I2 - I1)) / (I1 * I3))
+print(lam)  # 5.773502691896258
+</code></pre></div>
+
+<script>
+function copyCode(btn){
+  var code = btn.parentElement.querySelector('code');
+  if(!code) return;
+  var text = code.textContent;
+  var done = function(){
+    var label = btn.querySelector('span'), prev = label.textContent;
+    btn.classList.add('copied'); label.textContent = 'Copied!';
+    setTimeout(function(){ btn.classList.remove('copied'); label.textContent = prev; }, 1500);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done, function(){});
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); done(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+</script>
+
+</body>
+</html>
